@@ -94,6 +94,7 @@
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>allegro.lib;allegro_main.lib;allegro_image.lib;allegro_dialog.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro-5.1.dll" "$(OutDir)"

@@ -33,16 +33,20 @@ int main(int argc, char **argv){
 	float player_collisionBOX_w = 0;										  //
 	float player_collisionBOX_h = 0;										  //
 	bool arrayKeys[4] = { false,false,false,false };					  //
+	enemy* bicho1[10];
+	for (int i = 0; i < 10; i++)
+	{
+		bicho1[i] = new enemy();
 
-	enemy* bicho1 = new enemy();
-
-	bicho1->enemyPOS_x = 0;
-	bicho1->enemyPOS_y = 200;
-	bicho1->enemy_collisionBOX_x = bicho1->enemyPOS_x;
-	bicho1->enemy_collisionBOX_y = bicho1->enemyPOS_y;
-	bicho1->enemy_collisionBOX_h = 0;
-	bicho1->enemy_collisionBOX_w = 0;
-	bicho1->movement = true;
+		bicho1[i]->enemyPOS_x = i * 20;
+		bicho1[i]->enemyPOS_y = i * 40;
+		bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemyPOS_x;
+		bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemyPOS_y;
+		bicho1[i]->enemy_collisionBOX_h = 0;
+		bicho1[i]->enemy_collisionBOX_w = 0;
+		bicho1[i]->movement = true;
+	}
+	
 
 
 	/*const float enemySPEED = 0.5;						//Variables del player//
@@ -93,10 +97,12 @@ int main(int argc, char **argv){
 			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  //
 		al_destroy_display(display);																					  //
 		return 0;																										  //
-	}																													  //
-	bicho1->enemy_collisionBOX_h = al_get_bitmap_height(image2);																  //
-	bicho1->enemy_collisionBOX_w = al_get_bitmap_width(image2);																	  //
-
+	}			
+	for (int i = 0; i < 1; i++)
+	{
+		bicho1[i]->enemy_collisionBOX_h = al_get_bitmap_height(image2);																  //
+		bicho1[i]->enemy_collisionBOX_w = al_get_bitmap_width(image2);																	  //
+	}
 	if (!al_install_keyboard())    //iniciacion del teclado
 	{
 		al_show_native_message_box(display, "Error", "Error", "Failed to load keyboard!",
@@ -109,7 +115,10 @@ int main(int argc, char **argv){
 	al_register_event_source(event_queque, al_get_keyboard_event_source());
 
 	//Un DRAW fuera del GameLoop, para que dibuje todo la primera vez, sino sale todo blanco por el al_wait_for_event//
-	al_draw_bitmap(image2, bicho1->enemyPOS_x, bicho1->enemyPOS_y, 0);
+	for (int i = 0; i < 1; i++)
+	{
+		al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
+	}
 	al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
 	al_flip_display();
 	al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -157,24 +166,27 @@ int main(int argc, char **argv){
 				break;
 			}
 		}
-		if (bicho1->enemyPOS_x >= 640 - bicho1->enemySize)
+		for (int i = 0; i < 1; i++)
 		{
-			bicho1->movement = false;
+			if (bicho1[i]->enemyPOS_x >= 640 - bicho1[i]->enemySize)
+			{
+				bicho1[i]->movement = false;
+			}
+			if (bicho1[i]->enemyPOS_x <= 0)
+			{
+				bicho1[i]->movement = true;
+			}
+			if (bicho1[i]->movement == true)
+			{
+				bicho1[i]->enemyPOS_x += bicho1[i]->enemySPEED;
+			}
+			if (bicho1[i]->movement == false)
+			{
+				bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
+			}
+			//cout << bicho1[i]->enemyPOS_x << endl;
+
 		}
-		if (bicho1->enemyPOS_x <= 0)
-		{
-			bicho1->movement = true;
-		}
-		if (bicho1->movement == true)
-		{
-			bicho1->enemyPOS_x += bicho1->enemySPEED;
-		}
-		if (bicho1->movement == false)
-		{
-			bicho1->enemyPOS_x -= bicho1->enemySPEED;
-		}
-		
-		cout << bicho1->enemyPOS_x << endl;
 		//UPDATE//
 		playerPOS_x += arrayKeys[RIGHT] * playerSPEED;
 		playerPOS_x -= arrayKeys[LEFT] * playerSPEED;
@@ -183,20 +195,24 @@ int main(int argc, char **argv){
 
 		player_collisionBOX_x = player_collisionBOX_w /2;
 		player_collisionBOX_y = player_collisionBOX_h /2;
-
-		bicho1->enemy_collisionBOX_x = bicho1->enemy_collisionBOX_w /2;
-		bicho1->enemy_collisionBOX_y = bicho1->enemy_collisionBOX_h /2;
-
-		if (playerPOS_x + player_collisionBOX_x > bicho1->enemyPOS_x - bicho1->enemy_collisionBOX_x &&
-			playerPOS_x - player_collisionBOX_x < bicho1->enemyPOS_x + bicho1->enemy_collisionBOX_x &&
-			playerPOS_y + player_collisionBOX_y > bicho1->enemyPOS_y - bicho1->enemy_collisionBOX_y &&
-			playerPOS_y - player_collisionBOX_y < bicho1->enemyPOS_y + bicho1->enemy_collisionBOX_y)
+		for (int i = 0; i < 1; i++)
 		{
-			gameover = true;
-		}
+			bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemy_collisionBOX_w / 2;
+			bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemy_collisionBOX_h / 2;
 
+			if (playerPOS_x + player_collisionBOX_x > bicho1[i]->enemyPOS_x - bicho1[i]->enemy_collisionBOX_x &&
+				playerPOS_x - player_collisionBOX_x < bicho1[i]->enemyPOS_x + bicho1[i]->enemy_collisionBOX_x &&
+				playerPOS_y + player_collisionBOX_y > bicho1[i]->enemyPOS_y - bicho1[i]->enemy_collisionBOX_y &&
+				playerPOS_y - player_collisionBOX_y < bicho1[i]->enemyPOS_y + bicho1[i]->enemy_collisionBOX_y)
+			{
+				//gameover = true;
+			}
+		}
 		//DRAW//
-		al_draw_bitmap(image2, bicho1->enemyPOS_x, bicho1->enemyPOS_y, 0);
+		for (int i = 0; i < 1; i++)
+		{
+			al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
+		}
 		al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
 		al_flip_display();
 		al_clear_to_color(al_map_rgb(0, 0, 0));
