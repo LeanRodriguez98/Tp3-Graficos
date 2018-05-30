@@ -7,26 +7,53 @@ using namespace std;
 
 enum KEYS {UP,DOWN,LEFT,RIGHT};
 
+class enemy {
+public:
+	enemy() {};
+	const float enemySPEED = 0.3;						//Variables del player//
+	const int enemySize = 32;
+	float enemyPOS_x;							//Variables del enemy//
+	float enemyPOS_y;												 //
+	float enemy_collisionBOX_x;								 //
+	float enemy_collisionBOX_y;								 //
+	float enemy_collisionBOX_w;										 //
+	float enemy_collisionBOX_h;										 //
+	bool movement;
 
+};
 int main(int argc, char **argv){
 
 	bool gameover = false;							//Bool para el game loop
 
-	const int playerSPEED = 5;						//Variables del player//
-	int playerPOS_x = 0;												  //
-	int playerPOS_y = 0;												  //
-	int player_collisionBOX_x = playerPOS_x;							  //
-	int player_collisionBOX_y = playerPOS_y;							  //
-	int player_collisionBOX_w = 0;										  //
-	int player_collisionBOX_h = 0;										  //
-	bool arroyKeys[4] = { false,false,false,false };					  //
+	const float playerSPEED = 0.3;						//Variables del player//
+	float playerPOS_x = 0;												  //
+	float playerPOS_y = 0;												  //
+	float player_collisionBOX_x = playerPOS_x;							  //
+	float player_collisionBOX_y = playerPOS_y;							  //
+	float player_collisionBOX_w = 0;										  //
+	float player_collisionBOX_h = 0;										  //
+	bool arrayKeys[4] = { false,false,false,false };					  //
 
-	int enemyPOS_x = 200;							//Variables del enemy//
-	int enemyPOS_y = 200;												 //
-	int enemy_collisionBOX_x = enemyPOS_x;								 //
-	int enemy_collisionBOX_y = enemyPOS_y;								 //
-	int enemy_collisionBOX_w = 0;										 //
-	int enemy_collisionBOX_h = 0;										 //
+	enemy* bicho1 = new enemy();
+
+	bicho1->enemyPOS_x = 0;
+	bicho1->enemyPOS_y = 200;
+	bicho1->enemy_collisionBOX_x = bicho1->enemyPOS_x;
+	bicho1->enemy_collisionBOX_y = bicho1->enemyPOS_y;
+	bicho1->enemy_collisionBOX_h = 0;
+	bicho1->enemy_collisionBOX_w = 0;
+	bicho1->movement = true;
+
+
+	/*const float enemySPEED = 0.5;						//Variables del player//
+	const int enemySize = 32;
+	float enemyPOS_x = 0;							//Variables del enemy//
+	float enemyPOS_y = 200;												 //
+	float enemy_collisionBOX_x = enemyPOS_x;								 //
+	float enemy_collisionBOX_y = enemyPOS_y;								 //
+	float enemy_collisionBOX_w = 0;										 //
+	float enemy_collisionBOX_h = 0;										 //
+	bool movement = true;*/
 
 
 	ALLEGRO_DISPLAY *display = NULL;				//Declaracion de un display
@@ -67,8 +94,8 @@ int main(int argc, char **argv){
 		al_destroy_display(display);																					  //
 		return 0;																										  //
 	}																													  //
-	enemy_collisionBOX_h = al_get_bitmap_height(image2);																  //
-	enemy_collisionBOX_w = al_get_bitmap_width(image2);																	  //
+	bicho1->enemy_collisionBOX_h = al_get_bitmap_height(image2);																  //
+	bicho1->enemy_collisionBOX_w = al_get_bitmap_width(image2);																	  //
 
 	if (!al_install_keyboard())    //iniciacion del teclado
 	{
@@ -82,29 +109,30 @@ int main(int argc, char **argv){
 	al_register_event_source(event_queque, al_get_keyboard_event_source());
 
 	//Un DRAW fuera del GameLoop, para que dibuje todo la primera vez, sino sale todo blanco por el al_wait_for_event//
-	al_draw_bitmap(image2, enemyPOS_x, enemyPOS_y, 0);
+	al_draw_bitmap(image2, bicho1->enemyPOS_x, bicho1->enemyPOS_y, 0);
 	al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
 	al_flip_display();
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	while (!gameover)
 	{
+		al_get_next_event(event_queque, &events);
+		
 		//INPUT//
-		al_wait_for_event(event_queque, &events);
 		if (events.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
 			switch (events.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_DOWN:
-				arroyKeys[DOWN] = true;
+				arrayKeys[DOWN] = true;
 				break;
 			case ALLEGRO_KEY_UP:
-				arroyKeys[UP] = true;
+				arrayKeys[UP] = true;
 				break;
 			case ALLEGRO_KEY_LEFT:
-				arroyKeys[LEFT] = true;
+				arrayKeys[LEFT] = true;
 				break;
 			case ALLEGRO_KEY_RIGHT:
-				arroyKeys[RIGHT] = true;
+				arrayKeys[RIGHT] = true;
 				break;
 			case ALLEGRO_KEY_ESCAPE:
 				gameover = true;
@@ -116,42 +144,59 @@ int main(int argc, char **argv){
 			switch (events.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_DOWN:
-				arroyKeys[DOWN] = false;
+				arrayKeys[DOWN] = false;
 				break;
 			case ALLEGRO_KEY_UP:
-				arroyKeys[UP] = false;
+				arrayKeys[UP] = false;
 				break;
 			case ALLEGRO_KEY_LEFT:
-				arroyKeys[LEFT] = false;
+				arrayKeys[LEFT] = false;
 				break;
 			case ALLEGRO_KEY_RIGHT:
-				arroyKeys[RIGHT] = false;
+				arrayKeys[RIGHT] = false;
 				break;
 			}
 		}
-
+		if (bicho1->enemyPOS_x >= 640 - bicho1->enemySize)
+		{
+			bicho1->movement = false;
+		}
+		if (bicho1->enemyPOS_x <= 0)
+		{
+			bicho1->movement = true;
+		}
+		if (bicho1->movement == true)
+		{
+			bicho1->enemyPOS_x += bicho1->enemySPEED;
+		}
+		if (bicho1->movement == false)
+		{
+			bicho1->enemyPOS_x -= bicho1->enemySPEED;
+		}
+		
+		cout << bicho1->enemyPOS_x << endl;
 		//UPDATE//
-		playerPOS_x += arroyKeys[RIGHT] * playerSPEED;
-		playerPOS_x -= arroyKeys[LEFT] * playerSPEED;
-		playerPOS_y += arroyKeys[DOWN] * playerSPEED;
-		playerPOS_y -= arroyKeys[UP] * playerSPEED;
+		playerPOS_x += arrayKeys[RIGHT] * playerSPEED;
+		playerPOS_x -= arrayKeys[LEFT] * playerSPEED;
+		playerPOS_y += arrayKeys[DOWN] * playerSPEED;
+		playerPOS_y -= arrayKeys[UP] * playerSPEED;
 
 		player_collisionBOX_x = player_collisionBOX_w /2;
 		player_collisionBOX_y = player_collisionBOX_h /2;
 
-		enemy_collisionBOX_x = enemy_collisionBOX_w /2;
-		enemy_collisionBOX_y = enemy_collisionBOX_h /2;
+		bicho1->enemy_collisionBOX_x = bicho1->enemy_collisionBOX_w /2;
+		bicho1->enemy_collisionBOX_y = bicho1->enemy_collisionBOX_h /2;
 
-		if (playerPOS_x + player_collisionBOX_x > enemyPOS_x - enemy_collisionBOX_x &&
-			playerPOS_x - player_collisionBOX_x < enemyPOS_x + enemy_collisionBOX_x &&
-			playerPOS_y + player_collisionBOX_y > enemyPOS_y - enemy_collisionBOX_y &&
-			playerPOS_y - player_collisionBOX_y < enemyPOS_y + enemy_collisionBOX_y)
+		if (playerPOS_x + player_collisionBOX_x > bicho1->enemyPOS_x - bicho1->enemy_collisionBOX_x &&
+			playerPOS_x - player_collisionBOX_x < bicho1->enemyPOS_x + bicho1->enemy_collisionBOX_x &&
+			playerPOS_y + player_collisionBOX_y > bicho1->enemyPOS_y - bicho1->enemy_collisionBOX_y &&
+			playerPOS_y - player_collisionBOX_y < bicho1->enemyPOS_y + bicho1->enemy_collisionBOX_y)
 		{
 			gameover = true;
 		}
 
 		//DRAW//
-		al_draw_bitmap(image2, enemyPOS_x, enemyPOS_y, 0);
+		al_draw_bitmap(image2, bicho1->enemyPOS_x, bicho1->enemyPOS_y, 0);
 		al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
 		al_flip_display();
 		al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -166,6 +211,3 @@ int main(int argc, char **argv){
 
 }
 
-void Input(){
-
-}
