@@ -302,7 +302,7 @@ int main(int argc, char **argv){
 				delete bicho1[i];
 				delete bala;
 				cout << i << endl;
-				cantEnemys--;
+		//		cantEnemys--;
 				BoolBullets = false;
 			}
 		}
@@ -310,7 +310,8 @@ int main(int argc, char **argv){
 
 		for (int i = 0; i < cantEnemys; i++)
 		{
-			al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
+			if (bicho1[i] != NULL)
+				al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
 		}
 		if (BoolBullets == true)
 		{
