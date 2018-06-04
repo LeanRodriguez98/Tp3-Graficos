@@ -1,50 +1,78 @@
 #include <iostream>
-using namespace std;
 #include "allegro5\allegro.h"
 #include "allegro5\allegro_image.h"
 #include "allegro5\allegro_native_dialog.h"
+using namespace std;
 
 
-enum KEYS {UP,DOWN,LEFT,RIGHT};
+enum KEYS { UP, DOWN, LEFT, RIGHT, SPACEBAR };
 
 class enemy {
 public:
 	enemy() {};
-	const float enemySPEED = 0.3;						//Variables del player//
+	const float enemySPEED = 0.08;						
 	const int enemySize = 32;
-	float enemyPOS_x;							//Variables del enemy//
-	float enemyPOS_y;												 //
-	float enemy_collisionBOX_x;								 //
-	float enemy_collisionBOX_y;								 //
-	float enemy_collisionBOX_w;										 //
-	float enemy_collisionBOX_h;										 //
+	float enemyPOS_x ;							
+	float enemyPOS_y;												 
+	float enemy_collisionBOX_x;								 
+	float enemy_collisionBOX_y;								
+	float enemy_collisionBOX_w;										 
+	float enemy_collisionBOX_h;										 
 	bool movement;
 
 };
+class bullet {
+public:
+	bullet() {};
+	const float BulletSpeed = 0.05;
+	const int BulletSize = 4;
+	bool bulletUp;
+	bool bulletDown;
+	bool bulletRight;
+	bool bulletLeft;
+	float BulletPOS_x;							
+	float BulletPOS_y;
+	float Bullet_collisionBOX_x;								 
+	float Bullet_collisionBOX_y;
+	float Bullet_collisionBOX_w;
+	float Bullet_collisionBOX_h;
+	
+};
 int main(int argc, char **argv){
 
-	bool gameover = false;							//Bool para el game loop
+	bool gameover = false;						
 
-	const float playerSPEED = 0.3;						//Variables del player//
-	float playerPOS_x = 0;												  //
-	float playerPOS_y = 0;												  //
-	float player_collisionBOX_x = playerPOS_x;							  //
-	float player_collisionBOX_y = playerPOS_y;							  //
-	float player_collisionBOX_w = 0;										  //
-	float player_collisionBOX_h = 0;										  //
-	bool arrayKeys[4] = { false,false,false,false };					  //
+	const float playerSPEED = 0.03;					
+	float playerPOS_x = 0;												  
+	float playerPOS_y = 0;												  
+	float player_collisionBOX_x = playerPOS_x;							  
+	float player_collisionBOX_y = playerPOS_y;							  
+	float player_collisionBOX_w = 0;										  
+	float player_collisionBOX_h = 0;	
+	int playerSize = 32;
+	bool playerUp = true;
+	bool playerDown = false;
+	bool playerLeft = false;
+	bool playerRight = false;
+	
+	int cantEnemys = 0;
+	bool BoolBullets = false;
+	//
+	bool arrayKeys[4] = { false,false,false,false };					  
 	enemy* bicho1[10];
+	bullet* bala;
 	for (int i = 0; i < 10; i++)
 	{
 		bicho1[i] = new enemy();
 
 		bicho1[i]->enemyPOS_x = i * 20;
-		bicho1[i]->enemyPOS_y = i * 40;
+		bicho1[i]->enemyPOS_y = i * 40 + 40;
 		bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemyPOS_x;
 		bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemyPOS_y;
 		bicho1[i]->enemy_collisionBOX_h = 0;
 		bicho1[i]->enemy_collisionBOX_w = 0;
 		bicho1[i]->movement = true;
+		cantEnemys++;
 	}
 	
 
@@ -60,49 +88,60 @@ int main(int argc, char **argv){
 	bool movement = true;*/
 
 
-	ALLEGRO_DISPLAY *display = NULL;				//Declaracion de un display
-	ALLEGRO_BITMAP  *image = NULL;					//Declaracion de imagenes para el player y el enemigo//
-	ALLEGRO_BITMAP  *image2 = NULL;																		 //
+	ALLEGRO_DISPLAY *display = NULL;				
+	ALLEGRO_BITMAP  *image = NULL;					
+	ALLEGRO_BITMAP  *image2 = NULL;																		 
+	ALLEGRO_BITMAP  *bulletImage = NULL;
 
-	if (!al_init()) {                                          //iniciacion de allegro
+	if (!al_init()) {                                          
 		fprintf(stderr, "failed to initialize allegro!\n");
 		return -1;
 	}
 
-	if (!al_init_image_addon()) {								//iniciacion de image
+	if (!al_init_image_addon()) {								
 		al_show_native_message_box(display, "Error", "Error", "Failed to initialize al_init_image_addon!",
 			NULL, ALLEGRO_MESSAGEBOX_ERROR);
 		return 0;
 	}
 
-	display = al_create_display(640, 480);  //Creacion del display
+	display = al_create_display(640, 480);  
 	if (!display) {
 		fprintf(stderr, "failed to create display!\n");
 		return -1;
 	}
 
-	image = al_load_bitmap("Personaje.png");							//Carga de imagenes y seteo de cajas de colisiones//
-	if (!image) {																										  //						
-		al_show_native_message_box(display, "Error", "Error", "Failed to load image!",									  //
-			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  //
-		al_destroy_display(display);																					  //
-		return 0;																										  //
-	}																													  //
-	player_collisionBOX_h = al_get_bitmap_height(image);																  //
-	player_collisionBOX_w = al_get_bitmap_width(image);																	  //
-																														  //
-	image2 = al_load_bitmap("Enemy.png");																				  //
-	if (!image2) {																										  //
-		al_show_native_message_box(display, "Error", "Error", "Failed to load image!",									  //
-			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  //
-		al_destroy_display(display);																					  //
-		return 0;																										  //
-	}			
-	for (int i = 0; i < 1; i++)
-	{
-		bicho1[i]->enemy_collisionBOX_h = al_get_bitmap_height(image2);																  //
-		bicho1[i]->enemy_collisionBOX_w = al_get_bitmap_width(image2);																	  //
+	image = al_load_bitmap("Personaje.png");							
+	if (!image) {																										  					
+		al_show_native_message_box(display, "Error", "Error", "Failed to load player!",									  
+			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  
+		al_destroy_display(display);																					  
+		return 0;																										  
+	}																													  
+	player_collisionBOX_h = al_get_bitmap_height(image);																  
+	player_collisionBOX_w = al_get_bitmap_width(image);																	  
+																														  
+	image2 = al_load_bitmap("Enemy.png");																				  
+	if (!image2) {																										  
+		al_show_native_message_box(display, "Error", "Error", "Failed to load enemy!",									  
+			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  
+		al_destroy_display(display);																					  
+		return 0;																										  
+	}		
+
+	bulletImage = al_load_bitmap("Bullet.png");																				  
+	if (!bulletImage) {																										  
+		al_show_native_message_box(display, "Error", "Error", "Failed to load bullet!",									  
+			NULL, ALLEGRO_MESSAGEBOX_ERROR);																			  
+		al_destroy_display(display);																					  
+		return 0;																										  
 	}
+	for (int i = 0; i < cantEnemys; i++)
+	{
+		bicho1[i]->enemy_collisionBOX_h = al_get_bitmap_height(image2);
+		bicho1[i]->enemy_collisionBOX_w = al_get_bitmap_width(image2);
+	}
+	
+
 	if (!al_install_keyboard())    //iniciacion del teclado
 	{
 		al_show_native_message_box(display, "Error", "Error", "Failed to load keyboard!",
@@ -114,14 +153,8 @@ int main(int argc, char **argv){
 	ALLEGRO_EVENT events;										
 	al_register_event_source(event_queque, al_get_keyboard_event_source());
 
-	//Un DRAW fuera del GameLoop, para que dibuje todo la primera vez, sino sale todo blanco por el al_wait_for_event//
-	for (int i = 0; i < 1; i++)
-	{
-		al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
-	}
-	al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
-	al_flip_display();
-	al_clear_to_color(al_map_rgb(0, 0, 0));
+	
+	
 	while (!gameover)
 	{
 		al_get_next_event(event_queque, &events);
@@ -133,21 +166,51 @@ int main(int argc, char **argv){
 			{
 			case ALLEGRO_KEY_DOWN:
 				arrayKeys[DOWN] = true;
+				playerDown = true;
+				playerUp = false;
+				playerLeft = false;
+				playerRight = false;
 				break;
 			case ALLEGRO_KEY_UP:
 				arrayKeys[UP] = true;
+				playerDown = false;
+				playerUp = true;
+				playerLeft = false;
+				playerRight = false;
 				break;
 			case ALLEGRO_KEY_LEFT:
 				arrayKeys[LEFT] = true;
+				playerDown = false;
+				playerUp = false;
+				playerLeft = true;
+				playerRight = false;
 				break;
 			case ALLEGRO_KEY_RIGHT:
 				arrayKeys[RIGHT] = true;
+				playerDown = false;
+				playerUp = false;
+				playerLeft = false;
+				playerRight = true;
 				break;
 			case ALLEGRO_KEY_ESCAPE:
 				gameover = true;
 				break;
+			case ALLEGRO_KEY_SPACE:	
+				bala = new bullet();
+				
+				BoolBullets = true;		
+				bala->BulletPOS_x = playerPOS_x + (playerSize / 2);
+				bala->BulletPOS_y = playerPOS_y + (playerSize / 2);
+				bala->bulletUp = playerUp;
+				bala->bulletDown = playerDown;
+				bala->bulletLeft = playerLeft;
+				bala->bulletRight = playerRight;
+				bala->Bullet_collisionBOX_x = bala->BulletPOS_x;
+				bala->Bullet_collisionBOX_y = bala->BulletPOS_y;
+				bala->Bullet_collisionBOX_h = al_get_bitmap_height(bulletImage);
+				bala->Bullet_collisionBOX_w = al_get_bitmap_width(bulletImage);
 			}
-		}
+		}		
 		else if (events.type == ALLEGRO_EVENT_KEY_UP)
 		{
 			switch (events.keyboard.keycode)
@@ -162,11 +225,32 @@ int main(int argc, char **argv){
 				arrayKeys[LEFT] = false;
 				break;
 			case ALLEGRO_KEY_RIGHT:
-				arrayKeys[RIGHT] = false;
+				arrayKeys[RIGHT] = false;				
 				break;
 			}
 		}
-		for (int i = 0; i < 1; i++)
+	
+		if (BoolBullets)
+		{
+			if (bala->bulletDown)
+			{
+				bala->BulletPOS_y += bala->BulletSpeed;
+			}
+			if (bala->bulletUp)
+			{
+				bala->BulletPOS_y -= bala->BulletSpeed;
+			}
+			if (bala->bulletLeft)
+			{
+				bala->BulletPOS_x -= bala->BulletSpeed;
+			}
+			if (bala->bulletRight)
+			{
+				bala->BulletPOS_x += bala->BulletSpeed;
+			}
+		}
+		/*
+		for (int i = 0; i < cantEnemys; i++)
 		{
 			if (bicho1[i]->enemyPOS_x >= 640 - bicho1[i]->enemySize)
 			{
@@ -184,9 +268,9 @@ int main(int argc, char **argv){
 			{
 				bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
 			}
-			//cout << bicho1[i]->enemyPOS_x << endl;
+		}*/
 
-		}
+		
 		//UPDATE//
 		playerPOS_x += arrayKeys[RIGHT] * playerSPEED;
 		playerPOS_x -= arrayKeys[LEFT] * playerSPEED;
@@ -195,7 +279,7 @@ int main(int argc, char **argv){
 
 		player_collisionBOX_x = player_collisionBOX_w /2;
 		player_collisionBOX_y = player_collisionBOX_h /2;
-		for (int i = 0; i < 1; i++)
+		for (int i = 0; i < cantEnemys; i++)
 		{
 			bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemy_collisionBOX_w / 2;
 			bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemy_collisionBOX_h / 2;
@@ -206,24 +290,44 @@ int main(int argc, char **argv){
 				playerPOS_y - player_collisionBOX_y < bicho1[i]->enemyPOS_y + bicho1[i]->enemy_collisionBOX_y)
 			{
 				//gameover = true;
+
+			}
+
+			if( BoolBullets == true && 
+				(bala->BulletPOS_x + 4/*bala->Bullet_collisionBOX_x*/ > bicho1[i]->enemyPOS_x - bicho1[i]->enemy_collisionBOX_x &&
+				bala->BulletPOS_x - 4/*bala->Bullet_collisionBOX_x*/ < bicho1[i]->enemyPOS_x + bicho1[i]->enemy_collisionBOX_x &&
+				bala->BulletPOS_y + 4/*bala->Bullet_collisionBOX_y*/ > bicho1[i]->enemyPOS_y - bicho1[i]->enemy_collisionBOX_y &&
+				bala->BulletPOS_y - 4/*bala->Bullet_collisionBOX_y*/ < bicho1[i]->enemyPOS_y + bicho1[i]->enemy_collisionBOX_y))
+			{
+				delete bicho1[i];
+				delete bala;
+				cout << i << endl;
+				cantEnemys--;
+				BoolBullets = false;
 			}
 		}
 		//DRAW//
-		for (int i = 0; i < 1; i++)
+
+		for (int i = 0; i < cantEnemys; i++)
 		{
 			al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
+		}
+		if (BoolBullets == true)
+		{
+			al_draw_bitmap(bulletImage, bala->BulletPOS_x, bala->BulletPOS_y, 0);
 		}
 		al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
 		al_flip_display();
 		al_clear_to_color(al_map_rgb(0, 0, 0));
 	}
 
+
 	al_destroy_display(display);
 	al_destroy_bitmap(image);
 	al_destroy_bitmap(image2);
 	al_destroy_event_queue(event_queque);
+	//delete[] bicho1;
 
 	return 0;
-
 }
 
