@@ -72,7 +72,8 @@ int main(int argc, char **argv){
 	
 	int cantEnemys1 = 0;
 	int cantEnemys2 = 0;
-
+	int vidas = 3;
+	int damageTimer = 0;
 	bool BoolBullets = false;
 	bool startScreen = true;
 	const int ScreenX = 640;
@@ -188,13 +189,14 @@ int main(int argc, char **argv){
 
 	al_install_audio();
 	al_init_acodec_addon();
-
-	ALLEGRO_SAMPLE *backgrounMusic = al_load_sample("Jump.wav");
+	ALLEGRO_SAMPLE *backgrounMusic = al_load_sample("Music.wav");
 	ALLEGRO_SAMPLE *shootSound = al_load_sample("Shoot.wav");
 	ALLEGRO_SAMPLE *damageSound = al_load_sample("Damage.wav");
+	ALLEGRO_SAMPLE *lifeDownSound = al_load_sample("LifeDown.wav");
 
 
-	al_reserve_samples(3);////////////sumar para mas
+
+	al_reserve_samples(4);
 	al_play_sample(backgrounMusic, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, 0);
 
 nextLevel:
@@ -330,6 +332,24 @@ nextLevel:
 				}
 			}
 
+			if (playerPOS_x < 0)
+			{
+				playerPOS_x = 0;
+			}
+			if ((playerPOS_x + playerSize) > ScreenX)
+			{
+				playerPOS_x = ScreenX - playerSize;
+			}
+
+			if (playerPOS_y < 0)
+			{
+				playerPOS_y = 0;
+			}
+			if ((playerPOS_y + playerSize) > ScreenY)
+			{
+				playerPOS_y = ScreenY - playerSize;
+			}
+
 			if (BoolBullets)
 			{
 				if (bala->bulletDown)
@@ -355,6 +375,8 @@ nextLevel:
 			{
 				BoolBullets = false;
 			}
+
+
 
 
 			for (int i = 0; i < cantEnemys1; i++)
@@ -409,14 +431,18 @@ nextLevel:
 			{
 				if ((playerPOS_x + playerSize >= bicho1[i]->enemyPOS_x && playerPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (playerPOS_y + playerSize >= bicho1[i]->enemyPOS_y && playerPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize))
 				{
-					gameover = true;
+					vidas--;
+					al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+					playerPOS_x = 10;
+					playerPOS_y = 10;
 				}
 				if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho1[i]->enemyPOS_x && bala->BulletPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (bala->BulletPOS_y + bala->BulletSize >= bicho1[i]->enemyPOS_y && bala->BulletPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize)))
 				{
 					delete bicho1[i];
 					BoolBullets = false;
 					enemys1ToGenerate--;
-					al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+					al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
 
 				}
 			}
@@ -425,7 +451,12 @@ nextLevel:
 			{
 				if ((playerPOS_x + playerSize >= bicho2[i]->enemy2POS_x && playerPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (playerPOS_y + playerSize >= bicho2[i]->enemy2POS_y && playerPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size))
 				{
-					gameover = true;
+					vidas--;
+					al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+					playerPOS_x = 10;
+					playerPOS_y = 10;
+					
 				}
 				if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho2[i]->enemy2POS_x && bala->BulletPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (bala->BulletPOS_y + bala->BulletSize >= bicho2[i]->enemy2POS_y && bala->BulletPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size)))
 				{
@@ -441,6 +472,12 @@ nextLevel:
 
 				}
 			}
+
+			if (vidas <= 0)
+			{
+				gameover = true;
+			}
+			
 			//DRAW//
 
 			for (int i = 0; i < cantEnemys1; i++)
@@ -487,6 +524,11 @@ nextLevel:
 				{
 				case ALLEGRO_KEY_A:
 					startScreen = false;
+					break;
+
+				case ALLEGRO_KEY_ESCAPE:
+					gameover = true;
+					break;
 				}
 			}
 
@@ -501,6 +543,10 @@ nextLevel:
 	al_destroy_bitmap(image2);
 	al_destroy_bitmap(image);
 	al_destroy_sample(backgrounMusic);
+	al_destroy_sample(shootSound);
+	al_destroy_sample(damageSound);
+	al_destroy_sample(lifeDownSound);
+
 	al_destroy_event_queue(event_queque);
 
 	
