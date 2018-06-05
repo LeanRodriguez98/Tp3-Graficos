@@ -3,6 +3,7 @@
 #include "allegro5\allegro.h"
 #include "allegro5\allegro_image.h"
 #include "allegro5\allegro_native_dialog.h"
+#include "allegro5\allegro_acodec.h"
 using namespace std;
 
 
@@ -93,8 +94,7 @@ int main(int argc, char **argv){
 	ALLEGRO_BITMAP  *bulletImage = NULL;
 
 	
-		
-
+	
 	if (!al_init()) {                                          
 		fprintf(stderr, "failed to initialize allegro!\n");
 		return -1;
@@ -184,6 +184,19 @@ int main(int argc, char **argv){
 			NULL, ALLEGRO_MESSAGEBOX_ERROR);
 		return 0;
 	}
+
+
+	al_install_audio();
+	al_init_acodec_addon();
+
+	ALLEGRO_SAMPLE *backgrounMusic = al_load_sample("Jump.wav");
+	ALLEGRO_SAMPLE *shootSound = al_load_sample("Shoot.wav");
+	ALLEGRO_SAMPLE *damageSound = al_load_sample("Damage.wav");
+
+
+	al_reserve_samples(3);////////////sumar para mas
+	al_play_sample(backgrounMusic, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, 0);
+
 nextLevel:
 	
 	int enemys1ToGenerate = ((rand() % 10) + 1);
@@ -237,7 +250,7 @@ nextLevel:
 	while (!gameover)
 	{
 		al_get_next_event(event_queque, &events);
-		
+
 		if (startScreen == false)
 		{
 
@@ -293,6 +306,8 @@ nextLevel:
 						bala->bulletDown = playerDown;
 						bala->bulletLeft = playerLeft;
 						bala->bulletRight = playerRight;
+						al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
 					}
 				}
 			}
@@ -401,6 +416,8 @@ nextLevel:
 					delete bicho1[i];
 					BoolBullets = false;
 					enemys1ToGenerate--;
+					al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
 				}
 			}
 
@@ -417,6 +434,10 @@ nextLevel:
 					enemys2ToGenerate--;
 
 					delete bicho2[i];
+
+
+
+					al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
 
 				}
 			}
@@ -473,9 +494,13 @@ nextLevel:
 	}
 
 	al_destroy_display(display);
+	al_destroy_bitmap(fondo);
+	al_destroy_bitmap(bulletImage);
+	al_destroy_bitmap(image4);
+	al_destroy_bitmap(image3);
 	al_destroy_bitmap(image2);
 	al_destroy_bitmap(image);
-
+	al_destroy_sample(backgrounMusic);
 	al_destroy_event_queue(event_queque);
 
 	

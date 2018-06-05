@@ -93,13 +93,15 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>allegro.lib;allegro_main.lib;allegro_image.lib;allegro_dialog.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>allegro.lib;allegro_main.lib;allegro_image.lib;allegro_dialog.lib;allegro_audio.lib;allegro_acodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro-5.1.dll" "$(OutDir)"
 copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_dialog-5.1.dll" "$(OutDir)"
-copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_image-5.1.dll" "$(OutDir)"</Command>
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_image-5.1.dll" "$(OutDir)"
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_audio-5.1.dll" "$(OutDir)"
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_acodec-5.1.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
