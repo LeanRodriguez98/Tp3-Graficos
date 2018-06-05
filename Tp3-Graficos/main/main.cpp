@@ -12,7 +12,7 @@ enum KEYS { UP, DOWN, LEFT, RIGHT, SPACEBAR };
 class enemy {
 public:
 	enemy() {};
-	const float enemySPEED = 0.08;						
+	const float enemySPEED = 0.5;						
 	const int enemySize = 32;
 	float enemyPOS_x;							
 	float enemyPOS_y;												 
@@ -25,7 +25,7 @@ public:
 };
 class enemy2 {
 public:
-	const float enemy2SPEED = 0.07;
+	const float enemy2SPEED = 0.7;
 	const int enemy2Size = 32;
 	float enemy2POS_x;
 	float enemy2POS_y;
@@ -38,7 +38,7 @@ public:
 class bullet {
 public:
 	bullet() {};
-	const float BulletSpeed = 0.05;
+	const float BulletSpeed = 0.7;
 	const int BulletSize = 4;
 	bool bulletUp;
 	bool bulletDown;
@@ -57,7 +57,7 @@ int main(int argc, char **argv){
 	srand(time(NULL));
 	bool gameover = false;						
 
-	const float playerSPEED = 0.03;					
+	const float playerSPEED = 0.4;					
 	float playerPOS_x = 10;												  
 	float playerPOS_y = 10;												  
 	float player_collisionBOX_x = playerPOS_x;							  
@@ -78,6 +78,7 @@ int main(int argc, char **argv){
 	bool startScreen = true;
 	const int ScreenX = 640;
 	const int ScreenY = 500;
+	const float FPS = 60;
 	int randX = 0;
 	int randY = 0;
 	bool arrayKeys[4] = { false,false,false,false };					  
@@ -181,8 +182,7 @@ int main(int argc, char **argv){
 	}
 	if (!al_install_keyboard())    //iniciacion del teclado
 	{
-		al_show_native_message_box(display, "Error", "Error", "Failed to load keyboard!",
-			NULL, ALLEGRO_MESSAGEBOX_ERROR);
+		al_show_native_message_box(display, "Error", "Error", "Failed to load keyboard!",NULL, ALLEGRO_MESSAGEBOX_ERROR);
 		return 0;
 	}
 
@@ -198,6 +198,22 @@ int main(int argc, char **argv){
 
 	al_reserve_samples(4);
 	al_play_sample(backgrounMusic, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, 0);
+
+	ALLEGRO_TIMER *timer = NULL;
+
+	ALLEGRO_EVENT_QUEUE* event_queque = al_create_event_queue();
+	ALLEGRO_EVENT events;
+	al_register_event_source(event_queque, al_get_keyboard_event_source());
+
+	timer = al_create_timer(1.0 / FPS);
+	if (!timer)
+	{
+		al_show_native_message_box(display, "Error", "Error", "Failed to create timer", NULL, ALLEGRO_MESSAGEBOX_ERROR);
+		return -1;
+	}
+
+	al_register_event_source(event_queque, al_get_timer_event_source(timer));
+	al_start_timer(timer);
 
 nextLevel:
 	
@@ -245,9 +261,7 @@ nextLevel:
 
 	
 
-	ALLEGRO_EVENT_QUEUE* event_queque = al_create_event_queue();
-	ALLEGRO_EVENT events;
-	al_register_event_source(event_queque, al_get_keyboard_event_source());
+	
 
 	while (!gameover)
 	{
@@ -545,7 +559,7 @@ nextLevel:
 	al_destroy_sample(backgrounMusic);
 	al_destroy_sample(shootSound);
 	al_destroy_sample(damageSound);
-	al_destroy_sample(lifeDownSound);
+	al_destroy_sample(lifeDownSound);	
 
 	al_destroy_event_queue(event_queque);
 
