@@ -23,6 +23,7 @@ public:
 	float enemy_collisionBOX_w;										 
 	float enemy_collisionBOX_h;										 
 	bool movement;
+	bool alive;
 
 };
 class enemy2 {
@@ -36,6 +37,7 @@ public:
 	float enemy2_collisionBOX_w;
 	float enemy2_collisionBOX_h;
 	bool movement;
+	bool alive;
 };
 class bullet {
 public:
@@ -57,7 +59,8 @@ public:
 
 int main(int argc, char **argv){
 	srand(time(NULL));
-	bool gameover = false;						
+	bool gameover;	
+	bool gameClose = false;
 
 	const float playerSPEED = 0.04;					
 	float playerPOS_x = 10;												  
@@ -78,6 +81,7 @@ int main(int argc, char **argv){
 	int damageTimer = 0;
 	bool BoolBullets = false;
 	bool startScreen = true;
+	bool endScreen = false;
 	const int ScreenX = 640;
 	const int ScreenY = 500;
 	const float FPS = 60;
@@ -175,16 +179,16 @@ int main(int argc, char **argv){
 
 	for (int i = 0; i < cantEnemys1; i++)
 	{
-		bicho1[i]->enemy_collisionBOX_h = 32/*al_get_bitmap_height(image2)*/;
-		bicho1[i]->enemy_collisionBOX_w = 32/*al_get_bitmap_width(image2)*/;
+		bicho1[i]->enemy_collisionBOX_h = 32;
+		bicho1[i]->enemy_collisionBOX_w = 32;
 	}
 	
 	for (int i = 0; i < cantEnemys2; i++)
 	{
-		bicho2[i]->enemy2_collisionBOX_h = 32/*al_get_bitmap_height(image4)*/;
-		bicho2[i]->enemy2_collisionBOX_w = 32/*al_get_bitmap_width(image4)*/;
+		bicho2[i]->enemy2_collisionBOX_h = 32;
+		bicho2[i]->enemy2_collisionBOX_w = 32;
 	}
-	if (!al_install_keyboard())    //iniciacion del teclado
+	if (!al_install_keyboard())    
 	{
 		al_show_native_message_box(display, "Error", "Error", "Failed to load keyboard!",NULL, ALLEGRO_MESSAGEBOX_ERROR);
 		return 0;
@@ -224,355 +228,403 @@ int main(int argc, char **argv){
 	al_init_ttf_addon();
 
 	ALLEGRO_FONT *font = al_load_ttf_font("arial.ttf", 24, 0);
+	ALLEGRO_FONT *font2 = al_load_ttf_font("arial.ttf", 64, 0);
+
 
 	if (!font) {
-		fprintf(stderr, "Could not load 'pirulen.ttf'.\n");
+		fprintf(stderr, "Could not load 'arial.ttf'.\n");
 		return -1;
 	}
 
-nextLevel:
-	
-	int enemys1ToGenerate = ((rand() % 10) + 1);
-	int enemys2ToGenerate = ((rand() % 10) + 1);
-
-
-	for (int i = 0; i < enemys1ToGenerate; i++)
-	{
-		bicho1[i] = new enemy();
-		randX = (rand() % ScreenX - 40);
-		randY = (rand() % (ScreenY - 100));
-		bicho1[i]->enemyPOS_x = randX;
-		bicho1[i]->enemyPOS_y = randY + 40;		
-		bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemyPOS_x;
-		bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemyPOS_y;
-		bicho1[i]->enemy_collisionBOX_h = 0;
-		bicho1[i]->enemy_collisionBOX_w = 0;
-		bicho1[i]->movement = true;
-		cantEnemys1++;
-	}
-	
-	for (int i = 0; i < enemys2ToGenerate; i++)
-	{
-		bicho2[i] = new enemy2();
-		randX = (rand() % (ScreenX - 40));
-		randY = (rand() % (ScreenY - 100));
-		bicho2[i]->enemy2POS_x = randX + 60;
-		bicho2[i]->enemy2POS_y = randY;
-		bicho2[i]->enemy2_collisionBOX_x = bicho2[i]->enemy2POS_x;
-		bicho2[i]->enemy2_collisionBOX_y = bicho2[i]->enemy2POS_y;
-		bicho2[i]->enemy2_collisionBOX_h = 0;
-		bicho2[i]->enemy2_collisionBOX_w = 0;
-		bicho2[i]->movement = true;
-		cantEnemys2++;
+	if (!font2) {
+		fprintf(stderr, "Could not load 'arial.ttf'.\n");
+		return -1;
 	}
 
-	bala = new bullet();
-	bala->BulletPOS_x = playerPOS_x + (playerSize / 2);
-	bala->BulletPOS_y = playerPOS_y + (playerSize / 2);
-	bala->Bullet_collisionBOX_x = bala->BulletPOS_x;
-	bala->Bullet_collisionBOX_y = bala->BulletPOS_y;
-	bala->Bullet_collisionBOX_h = al_get_bitmap_height(bulletImage);
-	bala->Bullet_collisionBOX_w = al_get_bitmap_width(bulletImage);
-
 	
-
-	
-
-	while (!gameover)
+	while (!gameClose)
 	{
-		al_get_next_event(event_queque, &events);
 
-		if (startScreen == false)
+		gameover = false;
+
+		int enemys1ToGenerate = ((rand() % 10) + 1);
+		int enemys2ToGenerate = ((rand() % 10) + 1);
+
+
+		for (int i = 0; i < enemys1ToGenerate; i++)
 		{
-			
+			bicho1[i] = new enemy();
+			randX = (rand() % ScreenX - 40);
+			randY = (rand() % (ScreenY - 100));
+			bicho1[i]->enemyPOS_x = randX;
+			bicho1[i]->enemyPOS_y = randY + 40;
+			bicho1[i]->enemy_collisionBOX_x = bicho1[i]->enemyPOS_x;
+			bicho1[i]->enemy_collisionBOX_y = bicho1[i]->enemyPOS_y;
+			bicho1[i]->enemy_collisionBOX_h = 0;
+			bicho1[i]->enemy_collisionBOX_w = 0;
+			bicho1[i]->movement = true;
+			cantEnemys1++;
+			bicho1[i]->alive = true;
+		}
+
+		for (int i = 0; i < enemys2ToGenerate; i++)
+		{
+			bicho2[i] = new enemy2();
+			randX = (rand() % (ScreenX - 40));
+			randY = (rand() % (ScreenY - 100));
+			bicho2[i]->enemy2POS_x = randX + 60;
+			bicho2[i]->enemy2POS_y = randY;
+			bicho2[i]->enemy2_collisionBOX_x = bicho2[i]->enemy2POS_x;
+			bicho2[i]->enemy2_collisionBOX_y = bicho2[i]->enemy2POS_y;
+			bicho2[i]->enemy2_collisionBOX_h = 0;
+			bicho2[i]->enemy2_collisionBOX_w = 0;
+			bicho2[i]->movement = true;
+			cantEnemys2++;
+			bicho2[i]->alive = true;
+
+		}
+
+		bala = new bullet();
+		bala->BulletPOS_x = playerPOS_x + (playerSize / 2);
+		bala->BulletPOS_y = playerPOS_y + (playerSize / 2);
+		bala->Bullet_collisionBOX_x = bala->BulletPOS_x;
+		bala->Bullet_collisionBOX_y = bala->BulletPOS_y;
+		bala->Bullet_collisionBOX_h = al_get_bitmap_height(bulletImage);
+		bala->Bullet_collisionBOX_w = al_get_bitmap_width(bulletImage);
 
 
-			//INPUT//
-			if (BoolBullets == false)
+
+		while (!gameover)
+		{
+			al_get_next_event(event_queque, &events);
+
+			if (startScreen == false && endScreen == false)
 			{
-				bala->BulletPOS_x = playerPOS_x + (playerSize / 2);
-				bala->BulletPOS_y = playerPOS_y + (playerSize / 2);
-			}
-
-			if (events.type == ALLEGRO_EVENT_KEY_DOWN)
-			{
-				switch (events.keyboard.keycode)
+				
+				if (BoolBullets == false)
 				{
-				case ALLEGRO_KEY_DOWN:
-					arrayKeys[DOWN] = true;
-					playerDown = true;
-					playerUp = false;
-					playerLeft = false;
-					playerRight = false;
-					break;
-				case ALLEGRO_KEY_UP:
-					arrayKeys[UP] = true;
-					playerDown = false;
-					playerUp = true;
-					playerLeft = false;
-					playerRight = false;
-					break;
-				case ALLEGRO_KEY_LEFT:
-					arrayKeys[LEFT] = true;
-					playerDown = false;
-					playerUp = false;
-					playerLeft = true;
-					playerRight = false;
-					break;
-				case ALLEGRO_KEY_RIGHT:
-					arrayKeys[RIGHT] = true;
-					playerDown = false;
-					playerUp = false;
-					playerLeft = false;
-					playerRight = true;
-					break;
-				case ALLEGRO_KEY_ESCAPE:
-					gameover = true;
+					bala->BulletPOS_x = playerPOS_x + (playerSize / 2);
+					bala->BulletPOS_y = playerPOS_y + (playerSize / 2);
+				}
 
-					break;
-				case ALLEGRO_KEY_SPACE:
-					if (BoolBullets == false)
+				if (events.type == ALLEGRO_EVENT_KEY_DOWN)
+				{
+					switch (events.keyboard.keycode)
 					{
-						BoolBullets = true;
-						bala->bulletUp = playerUp;
-						bala->bulletDown = playerDown;
-						bala->bulletLeft = playerLeft;
-						bala->bulletRight = playerRight;
-						al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+					case ALLEGRO_KEY_DOWN:
+						arrayKeys[DOWN] = true;
+						playerDown = true;
+						playerUp = false;
+						playerLeft = false;
+						playerRight = false;
+						break;
+					case ALLEGRO_KEY_UP:
+						arrayKeys[UP] = true;
+						playerDown = false;
+						playerUp = true;
+						playerLeft = false;
+						playerRight = false;
+						break;
+					case ALLEGRO_KEY_LEFT:
+						arrayKeys[LEFT] = true;
+						playerDown = false;
+						playerUp = false;
+						playerLeft = true;
+						playerRight = false;
+						break;
+					case ALLEGRO_KEY_RIGHT:
+						arrayKeys[RIGHT] = true;
+						playerDown = false;
+						playerUp = false;
+						playerLeft = false;
+						playerRight = true;
+						break;
+					case ALLEGRO_KEY_ESCAPE:
+						gameover = true;
+						gameClose = true;
+
+						break;
+					case ALLEGRO_KEY_SPACE:
+						if (BoolBullets == false)
+						{
+							BoolBullets = true;
+							bala->bulletUp = playerUp;
+							bala->bulletDown = playerDown;
+							bala->bulletLeft = playerLeft;
+							bala->bulletRight = playerRight;
+							al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+						}
+					}
+				}
+				else if (events.type == ALLEGRO_EVENT_KEY_UP)
+				{
+					switch (events.keyboard.keycode)
+					{
+					case ALLEGRO_KEY_DOWN:
+						arrayKeys[DOWN] = false;
+						break;
+					case ALLEGRO_KEY_UP:
+						arrayKeys[UP] = false;
+						break;
+					case ALLEGRO_KEY_LEFT:
+						arrayKeys[LEFT] = false;
+						break;
+					case ALLEGRO_KEY_RIGHT:
+						arrayKeys[RIGHT] = false;
+						break;
+					}
+				}
+
+				if (playerPOS_x < 0)
+				{
+					playerPOS_x = 0;
+				}
+				if ((playerPOS_x + playerSize) > ScreenX)
+				{
+					playerPOS_x = ScreenX - playerSize;
+				}
+
+				if (playerPOS_y < 0)
+				{
+					playerPOS_y = 0;
+				}
+				if ((playerPOS_y + playerSize) > ScreenY)
+				{
+					playerPOS_y = ScreenY - playerSize;
+				}
+
+				if (BoolBullets)
+				{
+					if (bala->bulletDown)
+					{
+						bala->BulletPOS_y += bala->BulletSpeed;
+					}
+					if (bala->bulletUp)
+					{
+						bala->BulletPOS_y -= bala->BulletSpeed;
+					}
+					if (bala->bulletLeft)
+					{
+						bala->BulletPOS_x -= bala->BulletSpeed;
+					}
+					if (bala->bulletRight)
+					{
+						bala->BulletPOS_x += bala->BulletSpeed;
+					}
+				}
+
+
+				if (bala->BulletPOS_x > ScreenX || bala->BulletPOS_x < 0 || bala->BulletPOS_y > ScreenY || bala->BulletPOS_y < 0)
+				{
+					BoolBullets = false;
+				}
+
+
+
+
+				for (int i = 0; i < cantEnemys1; i++)
+				{
+					if (bicho1[i]->enemyPOS_x >= ScreenX - bicho1[i]->enemySize)
+					{
+						bicho1[i]->movement = false;
+					}
+					if (bicho1[i]->enemyPOS_x <= 0)
+					{
+						bicho1[i]->movement = true;
+					}
+					if (bicho1[i]->movement == true)
+					{
+						bicho1[i]->enemyPOS_x += bicho1[i]->enemySPEED;
+					}
+					if (bicho1[i]->movement == false)
+					{
+						bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
+					}
+				}
+
+				for (int i = 0; i < cantEnemys2; i++)
+				{
+					if (bicho2[i]->enemy2POS_y >= ScreenY - bicho2[i]->enemy2Size)
+					{
+						bicho2[i]->movement = false;
+					}
+					if (bicho2[i]->enemy2POS_y <= 0)
+					{
+						bicho2[i]->movement = true;
+					}
+					if (bicho2[i]->movement == true)
+					{
+						bicho2[i]->enemy2POS_y += bicho2[i]->enemy2SPEED;
+					}
+					if (bicho2[i]->movement == false)
+					{
+						bicho2[i]->enemy2POS_y -= bicho2[i]->enemy2SPEED;
+					}
+				}
+
+			
+				playerPOS_x += arrayKeys[RIGHT] * playerSPEED;
+				playerPOS_x -= arrayKeys[LEFT] * playerSPEED;
+				playerPOS_y += arrayKeys[DOWN] * playerSPEED;
+				playerPOS_y -= arrayKeys[UP] * playerSPEED;
+
+				player_collisionBOX_x = player_collisionBOX_w / 2;
+				player_collisionBOX_y = player_collisionBOX_h / 2;
+				for (int i = 0; i < cantEnemys1; i++)
+				{
+					if ((playerPOS_x + playerSize >= bicho1[i]->enemyPOS_x && playerPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (playerPOS_y + playerSize >= bicho1[i]->enemyPOS_y && playerPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize))
+					{
+						vidas--;
+						al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+						playerPOS_x = 10;
+						playerPOS_y = 10;
+					}
+					if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho1[i]->enemyPOS_x && bala->BulletPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (bala->BulletPOS_y + bala->BulletSize >= bicho1[i]->enemyPOS_y && bala->BulletPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize)))
+					{
+						bicho1[i]->alive = false;
+						delete bicho1[i];
+						
+						BoolBullets = false;
+						enemys1ToGenerate--;
+						al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+						puntaje += 10;
+						
+					}
+				}
+
+				for (int i = 0; i < cantEnemys2; i++)
+				{
+					if ((playerPOS_x + playerSize >= bicho2[i]->enemy2POS_x && playerPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (playerPOS_y + playerSize >= bicho2[i]->enemy2POS_y && playerPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size))
+					{
+						vidas--;
+						al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+						playerPOS_x = 10;
+						playerPOS_y = 10;
+
+					}
+					if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho2[i]->enemy2POS_x && bala->BulletPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (bala->BulletPOS_y + bala->BulletSize >= bicho2[i]->enemy2POS_y && bala->BulletPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size)))
+					{
+						bicho2[i]->alive = false;
+
+
+
+
+						BoolBullets = false;
+
+						enemys2ToGenerate--;
+
+						delete bicho2[i];
+
+
+
+						al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+
+						puntaje += 10;
+
+						
+
 
 					}
 				}
-			}
-			else if (events.type == ALLEGRO_EVENT_KEY_UP)
-			{
-				switch (events.keyboard.keycode)
-				{
-				case ALLEGRO_KEY_DOWN:
-					arrayKeys[DOWN] = false;
-					break;
-				case ALLEGRO_KEY_UP:
-					arrayKeys[UP] = false;
-					break;
-				case ALLEGRO_KEY_LEFT:
-					arrayKeys[LEFT] = false;
-					break;
-				case ALLEGRO_KEY_RIGHT:
-					arrayKeys[RIGHT] = false;
-					break;
-				}
-			}
 
-			if (playerPOS_x < 0)
-			{
-				playerPOS_x = 0;
-			}
-			if ((playerPOS_x + playerSize) > ScreenX)
-			{
-				playerPOS_x = ScreenX - playerSize;
-			}
+				if (vidas <= 0)
+				{					
+					endScreen = true;
+				}
 
-			if (playerPOS_y < 0)
-			{
-				playerPOS_y = 0;
-			}
-			if ((playerPOS_y + playerSize) > ScreenY)
-			{
-				playerPOS_y = ScreenY - playerSize;
-			}
+				
 
-			if (BoolBullets)
-			{
-				if (bala->bulletDown)
+				for (int i = 0; i < cantEnemys1; i++)
 				{
-					bala->BulletPOS_y += bala->BulletSpeed;
+					if (bicho1[i] != NULL)
+					{
+						al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
+					}
 				}
-				if (bala->bulletUp)
+				for (int i = 0; i < cantEnemys2; i++)
 				{
-					bala->BulletPOS_y -= bala->BulletSpeed;
+					if (bicho2[i] != NULL)
+					{
+						al_draw_bitmap(image4, bicho2[i]->enemy2POS_x, bicho2[i]->enemy2POS_y, 0);
+					}
 				}
-				if (bala->bulletLeft)
-				{
-					bala->BulletPOS_x -= bala->BulletSpeed;
-				}
-				if (bala->bulletRight)
-				{
-					bala->BulletPOS_x += bala->BulletSpeed;
-				}
-			}
+				al_draw_bitmap(image3, 0, 0, 0);
+				al_draw_bitmap(bulletImage, bala->BulletPOS_x, bala->BulletPOS_y, 0);
+				al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
+				al_draw_textf(font, al_map_rgb(255, 255, 255), 10, ScreenY - 40, ALLEGRO_ALIGN_LEFT, "Puntaje: %i", puntaje);
+				al_draw_textf(font, al_map_rgb(255, 255, 255), ScreenX - 10, ScreenY - 40, ALLEGRO_ALIGN_RIGHT, "Vidas: %i", vidas);
+
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0, 0, 0));
 
 
-			if (bala->BulletPOS_x > ScreenX || bala->BulletPOS_x < 0 || bala->BulletPOS_y > ScreenY || bala->BulletPOS_y < 0)
-			{
-				BoolBullets = false;
-			}
-
-
-
-
-			for (int i = 0; i < cantEnemys1; i++)
-			{
-				if (bicho1[i]->enemyPOS_x >= ScreenX - bicho1[i]->enemySize)
+				if (enemys1ToGenerate == 0 && enemys2ToGenerate == 0)
 				{
-					bicho1[i]->movement = false;
-				}
-				if (bicho1[i]->enemyPOS_x <= 0)
-				{
-					bicho1[i]->movement = true;
-				}
-				if (bicho1[i]->movement == true)
-				{
-					bicho1[i]->enemyPOS_x += bicho1[i]->enemySPEED;
-				}
-				if (bicho1[i]->movement == false)
-				{
-					bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
-				}
-			}
-
-			for (int i = 0; i < cantEnemys2; i++)
-			{
-				if (bicho2[i]->enemy2POS_y >= ScreenY - bicho2[i]->enemy2Size)
-				{
-					bicho2[i]->movement = false;
-				}
-				if (bicho2[i]->enemy2POS_y <= 0)
-				{
-					bicho2[i]->movement = true;
-				}
-				if (bicho2[i]->movement == true)
-				{
-					bicho2[i]->enemy2POS_y += bicho2[i]->enemy2SPEED;
-				}
-				if (bicho2[i]->movement == false)
-				{
-					bicho2[i]->enemy2POS_y -= bicho2[i]->enemy2SPEED;
-				}
-			}
-
-			//UPDATE//
-			playerPOS_x += arrayKeys[RIGHT] * playerSPEED;
-			playerPOS_x -= arrayKeys[LEFT] * playerSPEED;
-			playerPOS_y += arrayKeys[DOWN] * playerSPEED;
-			playerPOS_y -= arrayKeys[UP] * playerSPEED;
-
-			player_collisionBOX_x = player_collisionBOX_w / 2;
-			player_collisionBOX_y = player_collisionBOX_h / 2;
-			for (int i = 0; i < cantEnemys1; i++)
-			{
-				if ((playerPOS_x + playerSize >= bicho1[i]->enemyPOS_x && playerPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (playerPOS_y + playerSize >= bicho1[i]->enemyPOS_y && playerPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize))
-				{
-					vidas--;
-					al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+					cantEnemys1 = 0;
+					cantEnemys2 = 0;
 
 					playerPOS_x = 10;
 					playerPOS_y = 10;
-				}
-				if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho1[i]->enemyPOS_x && bala->BulletPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (bala->BulletPOS_y + bala->BulletSize >= bicho1[i]->enemyPOS_y && bala->BulletPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize)))
-				{
-					delete bicho1[i];
-					BoolBullets = false;
-					enemys1ToGenerate--;
-					al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
-					puntaje += 10;
-
-				}
-			}
-
-			for (int i = 0; i < cantEnemys2; i++)
-			{
-				if ((playerPOS_x + playerSize >= bicho2[i]->enemy2POS_x && playerPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (playerPOS_y + playerSize >= bicho2[i]->enemy2POS_y && playerPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size))
-				{
-					vidas--;
-					al_play_sample(shootSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
-
-					playerPOS_x = 10;
-					playerPOS_y = 10;
-					
-				}
-				if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho2[i]->enemy2POS_x && bala->BulletPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (bala->BulletPOS_y + bala->BulletSize >= bicho2[i]->enemy2POS_y && bala->BulletPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size)))
-				{
-					BoolBullets = false;
-
-					enemys2ToGenerate--;
-
-					delete bicho2[i];
-
-
-
-					al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
-
-
-					puntaje += 10;
-
-
-				}
-			}
-
-			if (vidas <= 0)
-			{
-				gameover = true;
-			}
-			
-			//DRAW//
-
-			for (int i = 0; i < cantEnemys1; i++)
-			{
-				if (bicho1[i] != NULL)
-				{
-					al_draw_bitmap(image2, bicho1[i]->enemyPOS_x, bicho1[i]->enemyPOS_y, 0);
-				}
-			}
-			for (int i = 0; i < cantEnemys2; i++)
-			{
-				if (bicho2[i] != NULL)
-				{
-					al_draw_bitmap(image4, bicho2[i]->enemy2POS_x, bicho2[i]->enemy2POS_y, 0);
-				}
-			}
-			al_draw_bitmap(image3, 0, 0, 0);
-			al_draw_bitmap(bulletImage, bala->BulletPOS_x, bala->BulletPOS_y, 0);
-			al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
-			al_draw_textf(font, al_map_rgb(255, 255, 255), 10, ScreenY - 40, ALLEGRO_ALIGN_LEFT, "Puntaje: %i",puntaje);
-			al_draw_textf(font, al_map_rgb(255, 255, 255), ScreenX - 10, ScreenY - 40, ALLEGRO_ALIGN_RIGHT, "Vidas: %i", vidas);
-
-			al_flip_display();
-			al_clear_to_color(al_map_rgb(0, 0, 0));
-
-
-			if (enemys1ToGenerate == 0 && enemys2ToGenerate == 0)
-			{
-				cantEnemys1 = 0;
-				cantEnemys2 = 0;
-
-				playerPOS_x = 10;
-				playerPOS_y = 10;
-				goto nextLevel;
-			}
-		}
-
-		if (startScreen == true)
-		{
-			al_draw_bitmap(fondo, 0, 0, 0);
-			al_flip_display();
-			al_clear_to_color(al_map_rgb(0, 0, 0));
-
-			if (events.type == ALLEGRO_EVENT_KEY_DOWN)
-			{
-				switch (events.keyboard.keycode)
-				{
-				case ALLEGRO_KEY_A:
-					startScreen = false;
-					break;
-
-				case ALLEGRO_KEY_ESCAPE:
 					gameover = true;
-					break;
 				}
 			}
+
+			if (startScreen == true && endScreen == false)
+			{
+				al_draw_bitmap(fondo, 0, 0, 0);
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0, 0, 0));
+
+				if (events.type == ALLEGRO_EVENT_KEY_DOWN)
+				{
+					switch (events.keyboard.keycode)
+					{
+					case ALLEGRO_KEY_A:
+						startScreen = false;
+
+						break;
+
+					case ALLEGRO_KEY_ESCAPE:
+						gameover = true;
+						gameClose = true;
+						break;
+					}
+				}
+
+			}
+
+			if (startScreen == false && endScreen == true)
+			{
+				al_flip_display();
+				al_clear_to_color(al_map_rgb(0, 0, 0));
+
+				al_draw_text(font2, al_map_rgb(255, 255, 255), ScreenX/2, ScreenY/2 - 80, ALLEGRO_ALIGN_CENTRE, "GAMEOVER");
+				al_draw_textf(font2, al_map_rgb(255, 255, 255), ScreenX / 2, ScreenY / 2 , ALLEGRO_ALIGN_CENTRE, "Puntaje: %i", puntaje);
+				al_draw_text(font, al_map_rgb(255, 255, 255), 10, ScreenY - 40, ALLEGRO_ALIGN_LEFT, "Pulsa Esc para salir");
+				
+
+				if (events.type == ALLEGRO_EVENT_KEY_DOWN)
+				{
+					switch (events.keyboard.keycode)
+					{	
+					case ALLEGRO_KEY_ESCAPE:
+						gameover = true;
+						gameClose = true;				
+						break;
+					}
+				}
+
+			}
+
+			
+
 
 		}
 	}
-
 	al_destroy_display(display);
 	al_destroy_bitmap(fondo);
 	al_destroy_bitmap(bulletImage);
@@ -584,11 +636,28 @@ nextLevel:
 	al_destroy_sample(shootSound);
 	al_destroy_sample(damageSound);
 	al_destroy_sample(lifeDownSound);	
+	al_destroy_font(font);
+	al_destroy_font(font2);
 
 	al_destroy_event_queue(event_queque);
 
 	
-	//delete[] bicho1;
+	for (int i = 0; i < cantEnemys1; i++)
+	{
+		if (bicho1[i]->alive == true)
+		{
+			delete bicho1[i];
+		}
+	}
+	for (int i = 0; i < cantEnemys2; i++)
+	{
+		if (bicho2[i]->alive == true)
+		{
+			delete bicho2[i];
+		}
+	}
+
+	delete bala;
 
 	return 0;
 }
