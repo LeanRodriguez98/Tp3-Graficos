@@ -4,6 +4,8 @@
 #include "allegro5\allegro_image.h"
 #include "allegro5\allegro_native_dialog.h"
 #include "allegro5\allegro_acodec.h"
+#include <allegro5\allegro_font.h>
+#include <allegro5\allegro_ttf.h>
 using namespace std;
 
 
@@ -12,7 +14,7 @@ enum KEYS { UP, DOWN, LEFT, RIGHT, SPACEBAR };
 class enemy {
 public:
 	enemy() {};
-	const float enemySPEED = 0.5;						
+	const float enemySPEED = 0.05;						
 	const int enemySize = 32;
 	float enemyPOS_x;							
 	float enemyPOS_y;												 
@@ -25,7 +27,7 @@ public:
 };
 class enemy2 {
 public:
-	const float enemy2SPEED = 0.7;
+	const float enemy2SPEED = 0.07;
 	const int enemy2Size = 32;
 	float enemy2POS_x;
 	float enemy2POS_y;
@@ -38,7 +40,7 @@ public:
 class bullet {
 public:
 	bullet() {};
-	const float BulletSpeed = 0.7;
+	const float BulletSpeed = 0.07;
 	const int BulletSize = 4;
 	bool bulletUp;
 	bool bulletDown;
@@ -57,7 +59,7 @@ int main(int argc, char **argv){
 	srand(time(NULL));
 	bool gameover = false;						
 
-	const float playerSPEED = 0.4;					
+	const float playerSPEED = 0.04;					
 	float playerPOS_x = 10;												  
 	float playerPOS_y = 10;												  
 	float player_collisionBOX_x = playerPOS_x;							  
@@ -81,11 +83,13 @@ int main(int argc, char **argv){
 	const float FPS = 60;
 	int randX = 0;
 	int randY = 0;
-	bool arrayKeys[4] = { false,false,false,false };					  
+	bool arrayKeys[4] = { false,false,false,false };		
+	int puntaje = 0;
+	
 	enemy* bicho1[10];
 	enemy2* bicho2[10];
 
-	bullet* bala;
+	bullet* bala; 
 	
 	ALLEGRO_DISPLAY *display = NULL;				
 	ALLEGRO_BITMAP  *image = NULL;					
@@ -215,6 +219,17 @@ int main(int argc, char **argv){
 	al_register_event_source(event_queque, al_get_timer_event_source(timer));
 	al_start_timer(timer);
 
+
+	al_init_font_addon();
+	al_init_ttf_addon();
+
+	ALLEGRO_FONT *font = al_load_ttf_font("arial.ttf", 24, 0);
+
+	if (!font) {
+		fprintf(stderr, "Could not load 'pirulen.ttf'.\n");
+		return -1;
+	}
+
 nextLevel:
 	
 	int enemys1ToGenerate = ((rand() % 10) + 1);
@@ -269,6 +284,7 @@ nextLevel:
 
 		if (startScreen == false)
 		{
+			
 
 
 			//INPUT//
@@ -457,6 +473,7 @@ nextLevel:
 					BoolBullets = false;
 					enemys1ToGenerate--;
 					al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+					puntaje += 10;
 
 				}
 			}
@@ -483,6 +500,10 @@ nextLevel:
 
 
 					al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+
+					puntaje += 10;
+
 
 				}
 			}
@@ -511,6 +532,9 @@ nextLevel:
 			al_draw_bitmap(image3, 0, 0, 0);
 			al_draw_bitmap(bulletImage, bala->BulletPOS_x, bala->BulletPOS_y, 0);
 			al_draw_bitmap(image, playerPOS_x, playerPOS_y, 0);
+			al_draw_textf(font, al_map_rgb(255, 255, 255), 10, ScreenY - 40, ALLEGRO_ALIGN_LEFT, "Puntaje: %i",puntaje);
+			al_draw_textf(font, al_map_rgb(255, 255, 255), ScreenX - 10, ScreenY - 40, ALLEGRO_ALIGN_RIGHT, "Vidas: %i", vidas);
+
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
 

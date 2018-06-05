@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1CBE597A-AAAF-43AA-8A98-C8688A0D3C8B}</ProjectGuid>
     <RootNamespace>main</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -93,7 +93,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)..\Allegro\allegro_5.1.12_x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>allegro.lib;allegro_main.lib;allegro_image.lib;allegro_dialog.lib;allegro_audio.lib;allegro_acodec.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>allegro.lib;allegro_main.lib;allegro_image.lib;allegro_dialog.lib;allegro_audio.lib;allegro_acodec.lib;allegro_font.lib;allegro_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
@@ -101,7 +101,9 @@
 copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_dialog-5.1.dll" "$(OutDir)"
 copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_image-5.1.dll" "$(OutDir)"
 copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_audio-5.1.dll" "$(OutDir)"
-copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_acodec-5.1.dll" "$(OutDir)"</Command>
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_acodec-5.1.dll" "$(OutDir)"
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_font-5.1.dll" "$(OutDir)"
+copy "$(SolutionDir)..\Allegro\allegro_5.1.12_x86\bin\allegro_ttf-5.1.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
