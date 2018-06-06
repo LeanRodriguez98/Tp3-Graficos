@@ -6,6 +6,7 @@
 #include "allegro5\allegro_acodec.h"
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
+
 using namespace std;
 
 
@@ -93,7 +94,7 @@ int main(int argc, char **argv){
 	enemy* bicho1[10];
 	enemy2* bicho2[10];
 
-	bullet* bala; 
+	bullet* bala = NULL; 
 	
 	ALLEGRO_DISPLAY *display = NULL;				
 	ALLEGRO_BITMAP  *image = NULL;					
@@ -425,41 +426,47 @@ int main(int argc, char **argv){
 
 				for (int i = 0; i < cantEnemys1; i++)
 				{
-					if (bicho1[i]->enemyPOS_x >= ScreenX - bicho1[i]->enemySize)
+					if (bicho1[i] != NULL)
 					{
-						bicho1[i]->movement = false;
-					}
-					if (bicho1[i]->enemyPOS_x <= 0)
-					{
-						bicho1[i]->movement = true;
-					}
-					if (bicho1[i]->movement == true)
-					{
-						bicho1[i]->enemyPOS_x += bicho1[i]->enemySPEED;
-					}
-					if (bicho1[i]->movement == false)
-					{
-						bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
+						if (bicho1[i]->enemyPOS_x >= ScreenX - bicho1[i]->enemySize)
+						{
+							bicho1[i]->movement = false;
+						}
+						if (bicho1[i]->enemyPOS_x <= 0)
+						{
+							bicho1[i]->movement = true;
+						}
+						if (bicho1[i]->movement == true)
+						{
+							bicho1[i]->enemyPOS_x += bicho1[i]->enemySPEED;
+						}
+						if (bicho1[i]->movement == false)
+						{
+							bicho1[i]->enemyPOS_x -= bicho1[i]->enemySPEED;
+						}
 					}
 				}
 
 				for (int i = 0; i < cantEnemys2; i++)
 				{
-					if (bicho2[i]->enemy2POS_y >= ScreenY - bicho2[i]->enemy2Size)
+					if (bicho2[i] != NULL)
 					{
-						bicho2[i]->movement = false;
-					}
-					if (bicho2[i]->enemy2POS_y <= 0)
-					{
-						bicho2[i]->movement = true;
-					}
-					if (bicho2[i]->movement == true)
-					{
-						bicho2[i]->enemy2POS_y += bicho2[i]->enemy2SPEED;
-					}
-					if (bicho2[i]->movement == false)
-					{
-						bicho2[i]->enemy2POS_y -= bicho2[i]->enemy2SPEED;
+						if (bicho2[i]->enemy2POS_y >= ScreenY - bicho2[i]->enemy2Size)
+						{
+							bicho2[i]->movement = false;
+						}
+						if (bicho2[i]->enemy2POS_y <= 0)
+						{
+							bicho2[i]->movement = true;
+						}
+						if (bicho2[i]->movement == true)
+						{
+							bicho2[i]->enemy2POS_y += bicho2[i]->enemy2SPEED;
+						}
+						if (bicho2[i]->movement == false)
+						{
+							bicho2[i]->enemy2POS_y -= bicho2[i]->enemy2SPEED;
+						}
 					}
 				}
 
@@ -473,64 +480,72 @@ int main(int argc, char **argv){
 				player_collisionBOX_y = player_collisionBOX_h / 2;
 				for (int i = 0; i < cantEnemys1; i++)
 				{
-					if ((playerPOS_x + playerSize >= bicho1[i]->enemyPOS_x && playerPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (playerPOS_y + playerSize >= bicho1[i]->enemyPOS_y && playerPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize))
+					if (bicho1[i] != NULL)
 					{
-						vidas--;
-						al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+						if ((playerPOS_x + playerSize >= bicho1[i]->enemyPOS_x && playerPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (playerPOS_y + playerSize >= bicho1[i]->enemyPOS_y && playerPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize))
+						{
+							vidas--;
+							al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
 
-						playerPOS_x = 10;
-						playerPOS_y = 10;
-					}
-					if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho1[i]->enemyPOS_x && bala->BulletPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (bala->BulletPOS_y + bala->BulletSize >= bicho1[i]->enemyPOS_y && bala->BulletPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize)))
-					{
-						bicho1[i]->alive = false;
-						delete bicho1[i];
-						
-						BoolBullets = false;
-						enemys1ToGenerate--;
-						al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
-						puntaje += 10;
-						
+							playerPOS_x = 10;
+							playerPOS_y = 10;
+						}
+						if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho1[i]->enemyPOS_x && bala->BulletPOS_x <= bicho1[i]->enemyPOS_x + bicho1[i]->enemySize) && (bala->BulletPOS_y + bala->BulletSize >= bicho1[i]->enemyPOS_y && bala->BulletPOS_y <= bicho1[i]->enemyPOS_y + bicho1[i]->enemySize)))
+						{
+							bicho1[i]->alive = false;
+							delete bicho1[i];
+							bicho1[i] = NULL;///////////////////////////////////////
+							BoolBullets = false;
+							enemys1ToGenerate--;
+							al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+							puntaje += 10;
+
+						}
 					}
 				}
 
 				for (int i = 0; i < cantEnemys2; i++)
 				{
-					if ((playerPOS_x + playerSize >= bicho2[i]->enemy2POS_x && playerPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (playerPOS_y + playerSize >= bicho2[i]->enemy2POS_y && playerPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size))
+					if (bicho2[i] != NULL)
 					{
-						vidas--;
-						al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+						if ((playerPOS_x + playerSize >= bicho2[i]->enemy2POS_x && playerPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (playerPOS_y + playerSize >= bicho2[i]->enemy2POS_y && playerPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size))
+						{
+							vidas--;
+							al_play_sample(lifeDownSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
 
-						playerPOS_x = 10;
-						playerPOS_y = 10;
+							playerPOS_x = 10;
+							playerPOS_y = 10;
 
-					}
-					if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho2[i]->enemy2POS_x && bala->BulletPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (bala->BulletPOS_y + bala->BulletSize >= bicho2[i]->enemy2POS_y && bala->BulletPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size)))
-					{
-						bicho2[i]->alive = false;
-
-
-
-
-						BoolBullets = false;
-
-						enemys2ToGenerate--;
-
-						delete bicho2[i];
+						}
+						if (BoolBullets == true && ((bala->BulletPOS_x + bala->BulletSize >= bicho2[i]->enemy2POS_x && bala->BulletPOS_x <= bicho2[i]->enemy2POS_x + bicho2[i]->enemy2Size) && (bala->BulletPOS_y + bala->BulletSize >= bicho2[i]->enemy2POS_y && bala->BulletPOS_y <= bicho2[i]->enemy2POS_y + bicho2[i]->enemy2Size)))
+						{
+							bicho2[i]->alive = false;
 
 
 
-						al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+							BoolBullets = false;
+
+							enemys2ToGenerate--;
+
+							delete bicho2[i];
 
 
-						puntaje += 10;
-
-						
 
 
+
+							bicho2[i] = NULL;
+							al_play_sample(damageSound, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+
+
+							puntaje += 10;
+
+
+
+
+						}
 					}
 				}
-
 				if (vidas <= 0)
 				{					
 					endScreen = true;
@@ -644,14 +659,14 @@ int main(int argc, char **argv){
 	
 	for (int i = 0; i < cantEnemys1; i++)
 	{
-		if (bicho1[i]->alive == true)
+		if (bicho1[i] != NULL)
 		{
 			delete bicho1[i];
 		}
 	}
 	for (int i = 0; i < cantEnemys2; i++)
 	{
-		if (bicho2[i]->alive == true)
+		if (bicho2[i] != NULL)
 		{
 			delete bicho2[i];
 		}
